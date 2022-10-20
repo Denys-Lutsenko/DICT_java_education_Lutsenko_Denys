@@ -22,14 +22,49 @@ public class chatbot {
             for ( int i = 0; i <= lets_count; i++){
             System.out.println(i+"!");
             }
+            System.out.println( "НУ давай затестимся");
+           int i = 0;
+           while (i<=3) {
 
+               System.out.println("Что такое Java?" +
+                       "1. caff`e" +
+                       "2. Lingua" +
+                       "3. Java — строго типизированный " +
+                       "объектно-ориентированный язык " +
+                       "программирования общего назначения");
+               int uno = input.nextInt();
+               if (uno == 3) {
+                   System.out.println("Что такое отладка?"+
+                           "1. cloc-cloc"+
+                          "2. Отладка – это процесс поиска" +
+                           " и устранения ошибок в программе." +
+                           "3. elif" );
+                   i++;
+               } else {
+                   System.out.println("try again");
+               }
+               int due = input.nextInt();
+               if (due == 2) {
+                   System.out.println("Что такое алгоритм?"+
+                          "1. Алгоритм – это конечный набор " +
+                           "шагов, которые при следовании им решают " +
+                           "какую-то задачу." +
+                           "2. Jast du it"+
+                           "3. ginocchio");
+                   i++;
+               } else {
+                   System.out.println("try again");
+               }
+               int tre = input.nextInt();
+               if (tre == 1) {
+                   i++;
+               } else {
+                   System.out.println("try again");
+               }
 
-
-
-
-
-
-
+           }
+            System.out.println("Great, you right!");
+            System.out.println("Goodbye, have a nice day!");
         }
     }
 
