@@ -1,34 +1,70 @@
 package machine;
 import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Arrays;
 
 public class CoffeeMachine {
+// This solution uses a hashmap of ingredients for flexibility, to allow easy addition of new ingredients
+// and printing of updated amounts of ingredients remaining.
 
-    static int calculateQuantity(String ingredient, int cups){
-        int amountPerCup = 0;
-        switch (ingredient) {
-            case "coffee":
-                amountPerCup = 15;
-                break;
-            case "water":
-                amountPerCup = 200;
-                break;
-            case "milk":
-                amountPerCup = 50;
-                break;
-            default:
-                break;
+    static int findMaxCups(HashMap<String, Integer> ingredients) {
+        int[] maxCups = new int[3];
+        int count = 0;
+
+        // Update array with max amount of cups for each ingredient
+        for (String key : ingredients.keySet()) {
+            int amountLeft = ingredients.get(key);
+            int amountPerCup = 1;
+
+            switch (key) {
+                case "Water":
+                    amountPerCup = 200;
+                    break;
+                case "Milk":
+                    amountPerCup = 50;
+                    break;
+                case "Coffee Beans":
+                    amountPerCup = 15;
+                    break;
+                default:
+                    break;
+            }
+            maxCups[count] = amountLeft / amountPerCup;
+            count++;
         }
 
-        return amountPerCup * cups;
+        // Find and return lowest amount of cups
+        Arrays.sort(maxCups);
+        return maxCups[0];
     }
 
     public static void main(String[] args) {
+        HashMap<String, Integer> ingredientsLeft = new HashMap<String, Integer>();
+
+        // Print prompts and add ingredient name and quantities to array
         Scanner sc = new Scanner(System.in);
-        System.out.println("How many cups of coffee would you like?");
+        System.out.println("Write how many ml of water the coffee machine has: ");
+        ingredientsLeft.put("Water", sc.nextInt());
+        System.out.println("Write how many ml of milk the coffee machine has: ");
+        ingredientsLeft.put("Milk", sc.nextInt());
+        System.out.println("Write how many grams of coffee beans the coffee machine has: ");
+        ingredientsLeft.put("Coffee Beans", sc.nextInt());
+        System.out.println("Write how many cups of coffee you will need: ");
         int cups = sc.nextInt();
-        System.out.printf("For %d cups of coffee, you will need:\n", cups);
-        System.out.printf("%d ml of water\n", calculateQuantity("water", cups));
-        System.out.printf("%d ml of milk\n", calculateQuantity("milk", cups));
-        System.out.printf("%d g of coffee beans\n", calculateQuantity("coffee", cups));
+
+        // Find max number of cups of coffee possible with ingredients
+        int maxCups = findMaxCups(ingredientsLeft);
+        String response;
+
+        // Print response including number of additional cups possible
+        if (maxCups > cups) {
+            response = String.format("Yes, I can make that amount of coffee (and even %d more than that)", maxCups - cups);
+        } else if (maxCups == cups) {
+            response = "Yes, I can make that amount of coffee";
+        } else {
+            response = String.format("No, I can only make %d cups of coffee", maxCups);
+        }
+        System.out.println(response);
+
     }
 }
