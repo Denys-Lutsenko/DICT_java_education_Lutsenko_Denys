@@ -1,6 +1,7 @@
 package machine;
 import java.util.Scanner;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class CoffeeMachine {
     public static HashMap<String, Integer> ingredientStore = new HashMap<String, Integer>();
@@ -35,58 +36,88 @@ public class CoffeeMachine {
         }
     }
 
-    static void buyCoffee() {
-        int waterRequired = 0;
-        int milkRequired = 0;
-        int coffeeBeansRequired = 0;
-        int price = 0;
+    static int getCoffeeSelection() {
         int coffeeSelection = 0;
         boolean validInput = false;
 
         // Take coffee selection input until valid int in range received
         while (!validInput) {
             System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:");
-            if (sc.hasNextInt()) {
-                coffeeSelection = sc.nextInt();
+            String input = sc.next();
+            // Return 0 if user inputs "back"
+            if("back".equals(input)) {
+                break;
+            }
+            // Check for
+            try {
+                coffeeSelection = Integer.parseInt(input);
                 if (coffeeSelection > 0 && coffeeSelection < 4) {
                     validInput = true;
                 } else {
                     System.out.println("Your selection must be between 1 & 3 inclusive.");
+                    sc.next();
                 }
-            } else {
+            } catch(Exception e) {
                 System.out.println("You must enter the number of your selection.");
             }
         }
+        return coffeeSelection;
+    }
 
-        // Set ingredient amounts and price based on selection
-        switch (coffeeSelection) {
-            case 1:
-                waterRequired = 250;
-                coffeeBeansRequired = 16;
-                price = 4;
-                break;
-            case 2:
-                waterRequired = 350;
-                coffeeBeansRequired = 20;
-                milkRequired = 75;
-                price = 7;
-                break;
-            case 3:
-                waterRequired = 200;
-                coffeeBeansRequired = 12;
-                milkRequired = 100;
-                price = 6;
-                break;
-            default:
-                break;
+    static void buyCoffee() {
+        HashMap<String, Integer> ingredientsRequired = new HashMap<String, Integer>();
+        ingredientsRequired.put("Water", 0);
+        ingredientsRequired.put("Milk", 0);
+        ingredientsRequired.put("Coffee Beans", 0);
+        ingredientsRequired.put("Cups", 1);
+        int price = 0;
+        // Take coffee selection input as integer 1-3
+        int coffeeSelection = getCoffeeSelection();
+        if (coffeeSelection > 0) {
+            // Set ingredient amounts and price based on selection
+            switch (coffeeSelection) {
+                case 1:
+                    ingredientsRequired.put("Water", 250);
+                    ingredientsRequired.put("Coffee Beans", 16);
+                    price = 4;
+                    break;
+                case 2:
+                    ingredientsRequired.put("Water", 350);
+                    ingredientsRequired.put("Milk", 75);
+                    ingredientsRequired.put("Coffee Beans", 20);
+                    price = 7;
+                    break;
+                case 3:
+                    ingredientsRequired.put("Water", 200);
+                    ingredientsRequired.put("Milk", 100);
+                    ingredientsRequired.put("Coffee Beans", 12);
+                    price = 6;
+                    break;
+                default:
+                    break;
+            }
+
+            // Set missingIngredient to ingredient name if ingredientStore value < ingredientsRequired value
+            String missingIngredient = "";
+            for (String key : ingredientStore.keySet()) {
+                if (ingredientStore.get(key) < ingredientsRequired.get(key)) {
+                    missingIngredient = key;
+                }
+            }
+
+            // Decrement ingredient amounts in ingredientStore. Increment balance. Print success message
+            if (missingIngredient.length() == 0) {
+                for(String key : ingredientStore.keySet()) {
+                    ingredientStore.put(key, ingredientStore.get(key) - ingredientsRequired.get(key));
+                }
+                balance += price;
+                System.out.println("I have enough resources, making you a coffee!");
+            } else {
+                System.out.printf("Sorry, not enough %s\n", missingIngredient);
+            }
         }
 
-        // Decrement ingredient amounts in ingredientStore. Increment balance.
-        ingredientStore.put("Water", ingredientStore.get("Water") - waterRequired);
-        ingredientStore.put("Milk", ingredientStore.get("Milk") - milkRequired);
-        ingredientStore.put("Coffee Beans", ingredientStore.get("Coffee Beans") - coffeeBeansRequired);
-        ingredientStore.put("Cups", ingredientStore.get("Cups") - 1);
-        balance += price;
+
     }
 
     static void withdrawBalance() {
@@ -96,32 +127,41 @@ public class CoffeeMachine {
     }
 
     public static void main(String[] args) {
-        // Add starting quantities of ingredients to ingredientStore and print
+        // Add starting quantities of ingredients to ingredientStore
         ingredientStore.put("Water", 400);
         ingredientStore.put("Milk", 540);
         ingredientStore.put("Coffee Beans", 120);
         ingredientStore.put("Cups", 9);
-        printContents();
 
-        // Prompt action selection. Store and format input.
-        System.out.println("Write action (buy, fill, take):");
-        String action = sc.next().toLowerCase().strip();
+        boolean machineRunning = true;
+        String action;
 
-        // Call method for the selected action
-        switch (action) {
-            case "buy":
-                buyCoffee();
-                break;
-            case "fill":
-                fillMachine();
-                break;
-            case "take":
-                withdrawBalance();
-                break;
-            default:
-                System.out.println("Invalid selection");
+        while(machineRunning) {
+            // Prompt action selection. Store and format input.
+            System.out.println("Write action (buy, fill, take):");
+             action = sc.next().toLowerCase().strip();
+
+            // Call method for the selected action
+            switch (action) {
+                case "buy":
+                    buyCoffee();
+                    break;
+                case "fill":
+                    fillMachine();
+                    break;
+                case "take":
+                    withdrawBalance();
+                    break;
+                case "remaining":
+                    printContents();
+                    break;
+                case "exit":
+                    machineRunning = false;
+                    break;
+                default:
+                    System.out.println("Invalid selection");
+            }
         }
 
-        printContents();
     }
 }
